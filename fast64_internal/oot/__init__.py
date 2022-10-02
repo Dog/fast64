@@ -8,7 +8,6 @@ from . import oot_operators
 from . import oot_skeleton
 from . import oot_spline
 from . import oot_utility
-from .c_writer import OOTBootupSceneOptions
 
 from ..panels import OOT_Panel
 from ..utility import prop_split
@@ -28,22 +27,21 @@ class OOT_FileSettingsPanel(OOT_Panel):
         col = self.layout.column()
         col.scale_y = 1.1  # extra padding, makes it easier to see these main settings
         prop_split(col, context.scene, "ootBlenderScale", "OOT Scene Scale")
-        prop_split(col, context.scene, "ootActorBlenderScale", "OOT Actor Scale")
-
+        col.prop(context.scene.fast64.oot, "shipOfHarkinianCompatible")
         prop_split(col, context.scene, "ootDecompPath", "Decomp Path")
-        col.prop(context.scene.fast64.oot, "hackerFeaturesEnabled")
 
 
 class OOT_Properties(bpy.types.PropertyGroup):
     """Global OOT Scene Properties found under scene.fast64.oot"""
 
     version: bpy.props.IntProperty(name="OOT_Properties Version", default=0)
-    hackerFeaturesEnabled: bpy.props.BoolProperty(name="Enable HackerOOT Features")
-    bootupSceneOptions: bpy.props.PointerProperty(type=OOTBootupSceneOptions)
+    shipOfHarkinianCompatible: bpy.props.BoolProperty(name="Ship of Harkinian Compatibility")
     DLExportSettings: bpy.props.PointerProperty(type=oot_f3d_writer.OOTDLExportSettings)
     DLImportSettings: bpy.props.PointerProperty(type=oot_f3d_writer.OOTDLImportSettings)
     skeletonExportSettings: bpy.props.PointerProperty(type=oot_skeleton.OOTSkeletonExportSettings)
     skeletonImportSettings: bpy.props.PointerProperty(type=oot_skeleton.OOTSkeletonImportSettings)
+    animExportSettings: bpy.props.PointerProperty(type=oot_anim.OOTAnimExportSettingsProperty)
+    animImportSettings: bpy.props.PointerProperty(type=oot_anim.OOTAnimImportSettingsProperty)
 
 
 oot_classes = (
@@ -97,7 +95,6 @@ def oot_register(registerPanels):
     bpy.types.Scene.ootBlenderScale = bpy.props.FloatProperty(
         name="Blender To OOT Scale", default=10, update=on_update_render_settings
     )
-    bpy.types.Scene.ootActorBlenderScale = bpy.props.FloatProperty(name="Blender To OOT Actor Scale", default=1000)
     bpy.types.Scene.ootDecompPath = bpy.props.StringProperty(name="Decomp Folder", subtype="FILE_PATH")
 
 
@@ -120,5 +117,4 @@ def oot_unregister(unregisterPanels):
         oot_panel_unregister()
 
     del bpy.types.Scene.ootBlenderScale
-    del bpy.types.Scene.ootActorBlenderScale
     del bpy.types.Scene.ootDecompPath
